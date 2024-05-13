@@ -1,6 +1,6 @@
-package jsl.com.mocking.repository;
+package jsl.com.mocking.first.repository;
 
-import jsl.com.mocking.entity.Person;
+import jsl.com.mocking.first.entity.Person;
 
 import java.util.List;
 import java.util.Optional;

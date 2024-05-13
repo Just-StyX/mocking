@@ -1,9 +1,9 @@
 package jsl.com.mocking;
 
-import jsl.com.mocking.entity.Person;
-import jsl.com.mocking.repository.PersonRepository;
-import jsl.com.mocking.repository.TranslationService;
-import jsl.com.mocking.service.HelloPerson;
+import jsl.com.mocking.first.entity.Person;
+import jsl.com.mocking.first.repository.PersonRepository;
+import jsl.com.mocking.first.repository.TranslationService;
+import jsl.com.mocking.first.service.HelloPerson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

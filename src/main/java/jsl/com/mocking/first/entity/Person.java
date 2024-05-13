@@ -1,4 +1,4 @@
-package jsl.com.mocking.entity;
+package jsl.com.mocking.first.entity;
 
 import java.time.LocalDate;
 

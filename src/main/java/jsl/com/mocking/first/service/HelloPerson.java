@@ -1,8 +1,8 @@
-package jsl.com.mocking.service;
+package jsl.com.mocking.first.service;
 
-import jsl.com.mocking.entity.Person;
-import jsl.com.mocking.repository.PersonRepository;
-import jsl.com.mocking.repository.TranslationService;
+import jsl.com.mocking.first.entity.Person;
+import jsl.com.mocking.first.repository.PersonRepository;
+import jsl.com.mocking.first.repository.TranslationService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
