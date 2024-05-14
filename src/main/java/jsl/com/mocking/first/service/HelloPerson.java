@@ -5,6 +5,7 @@ import jsl.com.mocking.first.repository.PersonRepository;
 import jsl.com.mocking.first.repository.TranslationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,5 +43,13 @@ public class HelloPerson {
 
     public long count() {
         return personRepository.count();
+    }
+
+    public List<Person> findByIds(int ...ids) {
+        return Arrays.stream(ids)
+                .mapToObj(id -> personRepository.findById(id))
+                .filter(person -> person.isPresent())
+                .map(person -> person.get())
+                .collect(Collectors.toList());
     }
 }

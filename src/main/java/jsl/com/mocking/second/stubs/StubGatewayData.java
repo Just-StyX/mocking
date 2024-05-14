@@ -6,9 +6,9 @@ import jsl.com.mocking.second.Gateway;
 
 import java.util.List;
 
-public class StubGatewayData implements Gateway<AstronautResponse> {
-    @Override
-    public AstronautResponse getResponse() {
+public class StubGatewayData {
+
+    public static AstronautResponse getResponse() {
         return new AstronautResponse(
                 7, "job done",
                 List.of(

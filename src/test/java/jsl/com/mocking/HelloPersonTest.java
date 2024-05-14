@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -40,6 +41,7 @@ public class HelloPersonTest {
     private HelloPerson helloPerson;
 
     private List<Person> people = new ArrayList<>();
+
     @BeforeEach
     void setPersonRepository() {
         people = InMemoryPeopleRepositoryImpl.initialData();
@@ -48,6 +50,28 @@ public class HelloPersonTest {
     @AfterEach
     void afterEachTest() {
         InMemoryPeopleRepositoryImpl.deleteAll();
+    }
+
+    @Test
+    void throwExceptionWhenDeleteIsPassNullArgument() {
+        doThrow(RuntimeException.class).when(personRepository).delete(null);
+        assertThatThrownBy(() -> helloPerson.delete(null)).isInstanceOf(RuntimeException.class);
+        verify(personRepository).delete(null);
+    }
+
+    @Test
+    void findByIds() {
+        when(personRepository.findById(anyInt())).thenReturn(
+                Optional.of(people.get(0)),
+                Optional.of(people.get(1)),
+                Optional.of(people.get(2)),
+                Optional.of(people.get(3)),
+                Optional.of(people.get(4)),
+                Optional.empty()
+        ).thenThrow(new IllegalArgumentException("invalid person id")); // this will not be called
+        List<Person> personList = helloPerson.findByIds(0, 1, 2, 3, 4, 5);
+        assertThat(personList).containsExactlyElementsOf(people);
+        verify(personRepository, atMost(6)).findById(anyInt());
     }
 
     @Test
