@@ -5,7 +5,9 @@ import jsl.com.mocking.first.repository.PersonRepository;
 import jsl.com.mocking.first.repository.TranslationService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HelloPerson {
@@ -23,5 +25,22 @@ public class HelloPerson {
         Optional<Person> person = personRepository.findById(id);
         var name = person.map(Person::firstName).orElse("World");
         return translationService.translate(String.format(message, name), sourceLang, targetLang);
+    }
+
+    public List<String> lastNames() {
+        var people = personRepository.findAll();
+        return people.stream().map(Person::lastName).collect(Collectors.toList());
+    }
+
+    public Person save(Person person) {
+        return personRepository.save(person);
+    }
+
+    public void delete(Person person) {
+        personRepository.delete(person);
+    }
+
+    public long count() {
+        return personRepository.count();
     }
 }

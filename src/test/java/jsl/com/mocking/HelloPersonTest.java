@@ -3,7 +3,10 @@ package jsl.com.mocking;
 import jsl.com.mocking.first.entity.Person;
 import jsl.com.mocking.first.repository.PersonRepository;
 import jsl.com.mocking.first.repository.TranslationService;
+import jsl.com.mocking.first.repositoryImplementations.InMemoryPeopleRepositoryImpl;
 import jsl.com.mocking.first.service.HelloPerson;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +18,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.given;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class HelloPersonTest {
@@ -31,6 +38,54 @@ public class HelloPersonTest {
 
     @InjectMocks
     private HelloPerson helloPerson;
+
+    private List<Person> people = new ArrayList<>();
+    @BeforeEach
+    void setPersonRepository() {
+        people = InMemoryPeopleRepositoryImpl.initialData();
+    }
+
+    @AfterEach
+    void afterEachTest() {
+        InMemoryPeopleRepositoryImpl.deleteAll();
+    }
+
+    @Test
+    void getLastNamesByMocking() {
+        when(personRepository.findAll()).thenReturn(people);
+        List<String> lastNames = helloPerson.lastNames();
+        assertThat(lastNames).contains("Andreas", "Mata", "Kapoor", "Tey", "Piers");
+        verify(personRepository).findAll(); // verifying if findAll() method was called.
+    }
+
+    @Test
+    void savePerson() {
+        Person person = new Person(1000, "test", "testing", LocalDate.now());
+        when(personRepository.save(person)).thenReturn(InMemoryPeopleRepositoryImpl.save(person));
+        var savedPerson = helloPerson.save(person);
+        assertAll(
+                () -> assertNotNull(savedPerson),
+                () -> assertThat(1000).isEqualTo(savedPerson.id()),
+                () -> assertThat(6).isEqualTo(InMemoryPeopleRepositoryImpl.findAll().size()),
+                () -> {
+                    when(personRepository.count()).thenReturn(InMemoryPeopleRepositoryImpl.count());
+                    assertThat(6).isEqualTo(helloPerson.count());
+                    verify(personRepository).count();
+                }
+        );
+        verify(personRepository).save(person);
+    }
+
+    @Test
+    void deletePerson() {
+        var person = people.get(0);
+        doAnswer((invocationOnMock -> {
+            InMemoryPeopleRepositoryImpl.delete(invocationOnMock.getArgument(0));
+            return null;
+        })).when(personRepository).delete(person);
+        helloPerson.delete(person);
+        assertThat(4).isEqualTo(InMemoryPeopleRepositoryImpl.findAll().size());
+    }
 
     @Test
     @DisplayName("Greet Captain Shantosh")
